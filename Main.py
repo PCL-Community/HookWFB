@@ -73,4 +73,4 @@ def request_review(pr_number, reviewer):
     requests.post(url, headers=headers, json=data)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=18000)
