@@ -2,16 +2,12 @@ import logging
 from flask import Flask, request, jsonify
 import requests
 from random import randint
+from config import *
 
 app = Flask(__name__)
 
 # 设置日志记录
 logging.basicConfig(filename='app.log', level=logging.INFO, format='[%(asctime)s] %(levelname)s > %(message)s')
-
-GITHUB_TOKEN = 'yuanshen'
-GITHUB_USERNAME = 'PCL-Community'
-
-GITHUB_API_URL = 'https://api.github.com'
 
 # 设置Webhook路由
 @app.route('/webhook', methods=['POST'])
