@@ -4,8 +4,7 @@ import requests
 app = Flask(__name__)
 
 GITHUB_TOKEN = 'yuanshen'
-
-GITHUB_USERNAME = 'HelloWFB'
+GITHUB_USERNAME = 'PCL-Community'
 
 GITHUB_API_URL = 'https://api.github.com'
 
@@ -22,22 +21,22 @@ def handle_webhook():
         pr_user = pr.get('user', {}).get('login')
         pr_state = pr.get('state')
 
+        # 当PR被标记时
+        if action == 'labeled':
+            label_name = payload.get('label', {}).get('name')
+            if label_name == '通过':
+                approve_pr(pr_number)
+            elif label_name == '× 拒绝' and pr_state != 'closed':
+                close_pr(pr_number)
+
         # 当PR被WForst-Breeze批准时
         if action == 'submitted' and payload.get('review', {}).get('user', {}).get('login') == 'WForst-Breeze':
             if payload.get('review', {}).get('state') == 'approved':
                 add_label(pr_number, '通过')
 
-        # 当PR被添加“通过”标签时
-        if '通过' in pr_labels and action == 'labeled':
-            approve_pr(pr_number)
-
-        # 当PR被添加“拒绝”标签后
-        if '拒绝' in pr_labels and action == 'labeled':
-            close_pr(pr_number)
-
-        # 一个PR被close后
-        if action == 'closed' and pr_state == 'closed':
-            add_label(pr_number, '拒绝')
+        # 一个PR被close后且没有被合并
+        if action == 'closed' and pr_state == 'closed' and not pr.get('merged'):
+            add_label(pr_number, '× 拒绝')
 
         # 一个PR被创建后
         if action == 'opened':
@@ -48,9 +47,9 @@ def handle_webhook():
             add_label(pr_number, '完成')
 
     return jsonify({'status': 'success'}), 200
-
-def add_label(pr_number, label):
-    url = f'{GITHUB_API_URL}/repos/{GITHUB_USERNAME}/your_repo_name/issues/{pr_number}/labels'
+    
+    add_label(pr_number, label):
+    url = f'{GITHUB_API_URL}/repos/{GITHUB_USERNAME}/PCL2-1930/issues/{pr_number}/labels'
     headers = {'Authorization': f'token {GITHUB_TOKEN}'}
     data = {'labels': [label]}
     requests.post(url, headers=headers, json=data)
