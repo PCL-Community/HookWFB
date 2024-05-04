@@ -42,12 +42,12 @@ def handle_webhook():
         if action == 'submitted' and payload.get('review', {}).get('user', {}).get('login') == 'WForst-Breeze':
             logging.log(logging.INFO, f'[#{tempid}] WebHook 类型为被 WForst-Breeze 批准')
             if payload.get('review', {}).get('state') == 'approved':
-                add_label(pr_number, '通过', tempid)
+                add_label(pr_number, '⇵ 通过', tempid)
 
         # 一个PR被close后且没有被合并
         if action == 'closed' and pr_state == 'closed' and not pr.get('merged'):
             logging.log(logging.INFO, f'[#{tempid}] WebHook 类型为非合并的关闭')
-            add_label(pr_number, '拒绝', tempid)
+            add_label(pr_number, '× 拒绝', tempid)
 
         # 一个PR被创建后
         if action == 'opened':
@@ -57,7 +57,7 @@ def handle_webhook():
         # 一个PR被合并以后
         if action == 'closed' and pr.get('merged'):
             logging.log(logging.INFO, f'[#{tempid}] WebHook 类型为合并')
-            add_label(pr_number, '完成', tempid)
+            add_label(pr_number, '√ 完成', tempid)
 
     return jsonify({'status': 'success'}), 200
 
@@ -102,4 +102,4 @@ def request_review(pr_number, reviewer, tempid):
         logging.log(logging.ERROR, f'[#{tempid}] 请求 {reviewer} 审查第 {pr_number} 号 PR 失败')
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=18000)
+    app.run(host="0.0.0.0", port=18000, debug=True)
