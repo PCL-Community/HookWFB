@@ -55,19 +55,19 @@ def handle_webhook():
     requests.post(url, headers=headers, json=data)
 
 def approve_pr(pr_number):
-    url = f'{GITHUB_API_URL}/repos/{GITHUB_USERNAME}/your_repo_name/pulls/{pr_number}/reviews'
+    url = f'{GITHUB_API_URL}/repos/{GITHUB_USERNAME}/PCL2-1930/pulls/{pr_number}/reviews'
     headers = {'Authorization': f'token {GITHUB_TOKEN}'}
     data = {'event': 'APPROVE'}
     requests.post(url, headers=headers, json=data)
 
 def close_pr(pr_number):
-    url = f'{GITHUB_API_URL}/repos/{GITHUB_USERNAME}/your_repo_name/pulls/{pr_number}'
+    url = f'{GITHUB_API_URL}/repos/{GITHUB_USERNAME}/PCL2-1930/pulls/{pr_number}'
     headers = {'Authorization': f'token {GITHUB_TOKEN}'}
     data = {'state': 'closed'}
     requests.patch(url, headers=headers, json=data)
 
 def request_review(pr_number, reviewer):
-    url = f'{GITHUB_API_URL}/repos/{GITHUB_USERNAME}/your_repo_name/pulls/{pr_number}/requested_reviewers'
+    url = f'{GITHUB_API_URL}/repos/{GITHUB_USERNAME}/PCL2-1930/pulls/{pr_number}/requested_reviewers'
     headers = {'Authorization': f'token {GITHUB_TOKEN}'}
     data = {'reviewers': [reviewer]}
     requests.post(url, headers=headers, json=data)
