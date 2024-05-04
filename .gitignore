@@ -1,2 +1,3 @@
-# 不传token
+# 不传token和日志
 config.py
+*.log
