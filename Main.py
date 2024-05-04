@@ -6,6 +6,12 @@ from config import *
 
 app = Flask(__name__)
 
+# 可用标签
+class Label:
+    PASSED = '⇵ 通过'
+    REFUSE = '× 拒绝'
+    MERGED = '√ 完成'
+
 # 设置日志记录
 logging.basicConfig(filename='app.log', level=logging.INFO, format='[%(asctime)s] %(levelname)s > %(message)s')
 
@@ -18,7 +24,6 @@ def handle_webhook():
 
     if pr:
         pr_number = pr.get('number')
-        pr_labels = [label['name'] for label in pr.get('labels', [])]
         pr_state = pr.get('state')
 
         # 记录接收到的Webhook
@@ -29,10 +34,10 @@ def handle_webhook():
         if action == 'labeled':
             logging.log(logging.INFO, f'[#{tempid}] WebHook 类型为被标记')
             label_name = payload.get('label', {}).get('name')
-            if label_name == '通过':
+            if label_name == Label.PASSED:
                 logging.log(logging.INFO, f'[#{tempid}] 标记类型为 通过')
                 approve_pr(pr_number, tempid)
-            elif label_name == '拒绝' and pr_state != 'closed':
+            elif label_name == Label.REFUSE and pr_state != 'closed':
                 logging.log(logging.INFO, f'[#{tempid}] 标记类型为 拒绝')
                 close_pr(pr_number, tempid)
             else:
@@ -42,12 +47,12 @@ def handle_webhook():
         if action == 'submitted' and payload.get('review', {}).get('user', {}).get('login') == 'WForst-Breeze':
             logging.log(logging.INFO, f'[#{tempid}] WebHook 类型为被 WForst-Breeze 批准')
             if payload.get('review', {}).get('state') == 'approved':
-                add_label(pr_number, '⇵ 通过', tempid)
+                add_label(pr_number, Label.PASSED, tempid)
 
         # 一个PR被close后且没有被合并
         if action == 'closed' and pr_state == 'closed' and not pr.get('merged'):
             logging.log(logging.INFO, f'[#{tempid}] WebHook 类型为非合并的关闭')
-            add_label(pr_number, '× 拒绝', tempid)
+            add_label(pr_number, Label.REFUSE, tempid)
 
         # 一个PR被创建后
         if action == 'opened':
@@ -57,7 +62,7 @@ def handle_webhook():
         # 一个PR被合并以后
         if action == 'closed' and pr.get('merged'):
             logging.log(logging.INFO, f'[#{tempid}] WebHook 类型为合并')
-            add_label(pr_number, '√ 完成', tempid)
+            add_label(pr_number, Label.MERGED, tempid)
 
     return jsonify({'status': 'success'}), 200
 
