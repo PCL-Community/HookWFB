@@ -1,3 +1,6 @@
 # 不传token和日志
 config.py
 *.log
+
+# pyc
+__pycache__/
