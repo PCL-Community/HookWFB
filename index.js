@@ -6,7 +6,8 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // GitHub token and repository details
-const GITHUB_TOKEN = 'here you can use your token';
+//here you can use your token 
+const GITHUB_TOKEN = 'your_github_token';
 const octokit = new Octokit({ auth: GITHUB_TOKEN });
 
 app.use(bodyParser.json());
@@ -44,7 +45,7 @@ app.post('/webhook', async (req, res) => {
           owner: repoOwner,
           repo: repoName,
           pull_number: prNumber,
-          reviewers: ['shankkyy']
+          reviewers: ['WForst-Breeze']
         });
       }
     } else if (event === 'pull_request_review') {
@@ -53,7 +54,7 @@ app.post('/webhook', async (req, res) => {
       const repoOwner = payload.repository.owner.login;
       const repoName = payload.repository.name;
 
-      if (review.state === 'approved' && review.user.login === 'shankkyy') {
+      if (review.state === 'approved' && review.user.login === 'WForst-Breeze') {
         await octokit.issues.addLabels({
           owner: repoOwner,
           repo: repoName,
