@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const { Octokit } = require('@octokit/rest');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = 3000;
 
 // GitHub token and repository details
 //here you can use your token 
