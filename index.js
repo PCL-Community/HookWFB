@@ -6,7 +6,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // GitHub token and repository details
-const GITHUB_TOKEN = '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';
+const GITHUB_TOKEN = 'here you can use your token';
 const octokit = new Octokit({ auth: GITHUB_TOKEN });
 
 app.use(bodyParser.json());
