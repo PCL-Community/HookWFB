@@ -1,6 +1,1 @@
-# 不传token和日志
-config.py
-*.log
-
-# pyc
-__pycache__/
+node_modules/
