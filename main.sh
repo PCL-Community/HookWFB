@@ -32,7 +32,7 @@ handle_request() {
             ;;
         "labeled")
             label=$(echo "$payload" | jq -r '.label.name')
-            if [[ "$label" == "× 拒绝" ]] || [[ "$label" == "× 无效" ]]; then
+            if [[ "$label" == "× 拒绝" ]] || [[ "$label" == "× 无效" ]] || [[ "$label" == "× 重新编写" ]]; then
                 curl -s -H "Authorization: token $GITHUB_TOKEN" \
                      -H "Content-Type: application/json" \
                      -X PATCH \
