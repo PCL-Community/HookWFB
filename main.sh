@@ -5,6 +5,24 @@ GITHUB_TOKEN="your_github_token"
 REPO_OWNER="PCL-Community"
 REPO_NAME="PCL2-1930"
 
+add_label() {
+    local pr_number="$1"
+    local label="$2"
+    curl -s -H "Authorization: token $GITHUB_TOKEN" \
+         -H "Content-Type: application/json" \
+         -X POST \
+         -d "{\"labels\": [\"$label\"]}" \
+         "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/issues/$pr_number/labels"
+}
+
+remove_label() {
+    local pr_number="$1"
+    local label="$2"
+    curl -s -H "Authorization: token $GITHUB_TOKEN" \
+         -X DELETE \
+         "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/issues/$pr_number/labels/$label"
+}
+
 handle_request() {
     local payload="$1"
     event=$(echo "$payload" | jq -r '.action')
@@ -13,21 +31,18 @@ handle_request() {
     case "$event" in
         "closed")
             if echo "$payload" | jq -r '.pull_request.merged' | grep -q true; then
-                curl -s -H "Authorization: token $GITHUB_TOKEN" \
-                     -H "Content-Type: application/json" \
-                     -X POST \
-                     -d '{"labels": ["▲ 合并"]}' \
-                     "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/issues/$pr_number/labels"
+                add_label "$pr_number" "▲ 合并"
             fi
             ;;
-        "review_requested")
-            reviewer=$(echo "$payload" | jq -r '.requested_reviewer.login')
-            if [[ "$reviewer" == "WForst-Breeze" ]]; then
-                curl -s -H "Authorization: token $GITHUB_TOKEN" \
-                     -H "Content-Type: application/json" \
-                     -X POST \
-                     -d '{"labels": ["⇵ 通过"]}' \
-                     "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/issues/$pr_number/labels"
+        "submitted")
+            review_state=$(echo "$payload" | jq -r '.review.state')
+            reviewer=$(echo "$payload" | jq -r '.review.user.login')
+            if [[ "$review_state" == "changes_requested" ]]; then
+                add_label "$pr_number" "◈ 修正"
+                remove_label "$pr_number" "⇵ 通过"
+            elif [[ "$review_state" == "approved" && "$reviewer" == "WForst-Breeze" ]]; then
+                add_label "$pr_number" "⇵ 通过"
+                remove_label "$pr_number" "◈ 修正"
             fi
             ;;
         "labeled")
@@ -51,10 +66,11 @@ handle_request() {
 }
 
 while true; do
-    { 
+    {
         payload=""
-        while read -r line; do
+        while IFS= read -r line; do
             payload="$payload$line"
+            [ "$line" == $'\r' ] && break
         done
 
         handle_request "$payload"
