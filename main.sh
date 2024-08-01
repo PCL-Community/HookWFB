@@ -16,7 +16,7 @@ handle_request() {
                 curl -s -H "Authorization: token $GITHUB_TOKEN" \
                      -H "Content-Type: application/json" \
                      -X POST \
-                     -d '{"labels": ["合并"]}' \
+                     -d '{"labels": ["▲ 合并"]}' \
                      "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/issues/$pr_number/labels"
             fi
             ;;
@@ -26,13 +26,13 @@ handle_request() {
                 curl -s -H "Authorization: token $GITHUB_TOKEN" \
                      -H "Content-Type: application/json" \
                      -X POST \
-                     -d '{"labels": ["通过"]}' \
+                     -d '{"labels": ["⇵ 通过"]}' \
                      "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/issues/$pr_number/labels"
             fi
             ;;
         "labeled")
             label=$(echo "$payload" | jq -r '.label.name')
-            if [[ "$label" == "拒绝" ]] || [[ "$label" == "无效" ]]; then
+            if [[ "$label" == "× 拒绝" ]] || [[ "$label" == "× 无效" ]]; then
                 curl -s -H "Authorization: token $GITHUB_TOKEN" \
                      -H "Content-Type: application/json" \
                      -X PATCH \
