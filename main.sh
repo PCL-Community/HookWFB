@@ -2,8 +2,8 @@
 
 PORT=8080
 GITHUB_TOKEN="your_github_token"
-REPO_OWNER="your_repo_owner"
-REPO_NAME="your_repo_name"
+REPO_OWNER="PCL-Community"
+REPO_NAME="PCL2-1930"
 
 handle_request() {
     local payload="$1"
